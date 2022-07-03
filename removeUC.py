@@ -28,8 +28,8 @@ def getRegexes(tl: str) -> list:
 
     regexes = []
 
-    for raw in {'del': DELTLS, 'uc': UCTLS}.get(tl):
-        regexes.append(re.compile(raw, re.IGNORECASE))
+    for src in {'del': DELTLS, 'uc': UCTLS}.get(tl):
+        regexes.append(re.compile(src + "\n*", re.IGNORECASE))
 
     return regexes
 
