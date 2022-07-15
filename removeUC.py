@@ -1,46 +1,28 @@
-# TODO: Find a better way
 import re
+from typing import Pattern
 import pywikibot
 from pywikibot import pagegenerators
 
-def getRegexes(tl: str) -> list:
-    if tl != 'del' and tl != 'uc': raise Exception('Nope.')
+def getRegex(tl: str) -> Pattern:
+    if tl not in ('del', 'uc'): raise Exception('Nope.')
 
-    UCTLS = [ #UCTLS means Uncategorized Templates
-        "\{\{분류 {,1}필요\}\}",
-        "\{\{분류 없음\}\}",
-        "\{\{uncategorized\}\}",
-    ]
+    #UCTLS stands for Uncategorized Templates
+    UCTLS = "\{\{((분류( {,1}필요|없음))|(uncategorized))\}\}\n{,1}"
 
-    DELTLS = [ #DELTLS means Delete Templates
-        "\{\{삭제 {,1}(신|요)청\|",
-        "\{\{삭신{,1}\|",
-        "\{\{ㅅ{1,2}\|",
-        "\{\{ㅆ\|",
-        "\{\{del(ete){,1}\|",
-        "\{\{speedy(delete){,1}\|",
-    ]
+    #DELTLS stands for Delete Templates
+    DELTLS = "\{\{((삭제 {,1}(신|요)청)|(삭신{,1})|(ㅅ{1,2})|(ㅆ)|(del(ete){,1})|(speedy(delete){,1}))\|"
 
-    regexes = []
-
-    for src in {'del': DELTLS, 'uc': UCTLS}.get(tl):
-        regexes.append(re.compile(src + "\n{,1}", re.IGNORECASE))
-
-    return regexes
+    return re.compile({'del': DELTLS, 'uc': UCTLS}.get(tl), re.IGNORECASE)
 
 def main():
-    gen = pagegenerators.CategorizedPageGenerator(pywikibot.Category(pywikibot.Site(), '분류:분류 필요 문서'))
-
-    for page in gen:
+    for page in pagegenerators.CategorizedPageGenerator(pywikibot.Category(pywikibot.Site(), '분류:분류 필요 문서')):
         text_base = page.text
 
-        if not any(regex.search(text_base) for regex in getRegexes('del')):
+        if not getRegex('del').search(text_base):
             print("\"" + page.title() + "\" is not a candidate for speedy deletion. skipping...")
             continue
 
-        text_mod = text_base
-        for regex in getRegexes('uc'):
-            text_mod = regex.sub('', text_mod)
+        text_mod = getRegex('uc').sub('', text_base)
 
         print("Page : \"" + page.title() + "\"")
         pywikibot.showDiff(text_base, text_mod)
