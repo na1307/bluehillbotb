@@ -1,5 +1,6 @@
 import re
 from typing import Pattern
+from sys import stderr
 import pywikibot
 from pywikibot import pagegenerators
 
@@ -19,12 +20,12 @@ def main():
         text_base = page.text
 
         if not getRegex('del').search(text_base):
-            print("\"" + page.title() + "\" is not a candidate for speedy deletion. skipping...")
+            print('"' + page.title() + '" is not a candidate for speedy deletion. skipping...')
             continue
 
         text_mod = getRegex('uc').sub('', text_base)
 
-        print("Page : \"" + page.title() + "\"")
+        print('Page : "' + page.title() + '"', file=stderr)
         pywikibot.showDiff(text_base, text_mod)
 
         page.text = text_mod
