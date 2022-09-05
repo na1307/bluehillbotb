@@ -8,10 +8,10 @@ def getRegex(tl: str) -> Pattern:
     if tl not in ('del', 'uc'): raise Exception('Nope.')
 
     #UCTLS stands for Uncategorized Templates
-    UCTLS = "\{\{((분류( ?필요| 없음))|(uncategorized))\}\}\n?"
+    UCTLS = "\{\{(분류( ?필요| 없음)|uncategorized)\}\}\n?"
 
     #DELTLS stands for Delete Templates
-    DELTLS = "\{\{((삭제 ?(신|요)청)|(삭신?)|(ㅅ{1,2})|(ㅆ)|(del(ete)?)|(speedy(delete)?))\|"
+    DELTLS = "\{\{(삭제 ?(신|요)청|삭신?|ㅅ{1,2}|ㅆ|del(ete)?|speedy(delete)?)\|"
 
     return re.compile({'del': DELTLS, 'uc': UCTLS}.get(tl), re.IGNORECASE)
 
