@@ -22,9 +22,7 @@ def main():
     for page in pagegenerators.CategorizedPageGenerator(pywikibot.Category(pywikibot.Site(), '분류:분류 필요 문서')):
         text_base = page.text
 
-        if not getRegex(RegexType.Delete).search(text_base):
-            print('"' + page.title() + '" is not a candidate for speedy deletion. skipping...')
-            continue
+        if not getRegex(RegexType.Delete).search(text_base): continue
 
         text_mod = getRegex(RegexType.Uncategorized).sub('', text_base)
 
