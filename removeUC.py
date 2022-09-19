@@ -43,7 +43,7 @@ def main():
         try:
             page.save("봇: 삭제 신청된 문서에서 분류 필요 틀 제거")
         except pywikibot.exceptions.LockedPageError:
-            print("Page is protected.")
+            print("Page is protected.", file=stderr)
 
 
 if __name__ == "__main__":
