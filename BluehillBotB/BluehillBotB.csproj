@@ -8,4 +8,7 @@
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="CXuesong.MW.WikiClientLibrary" />
+  </ItemGroup>
 </Project>

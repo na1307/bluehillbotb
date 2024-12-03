@@ -5,6 +5,9 @@
     <CentralPackageVersionOverrideEnabled>false</CentralPackageVersionOverrideEnabled>
   </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="CXuesong.MW.WikiClientLibrary" Version="0.9.0-int.2" />
+  </ItemGroup>
+  <ItemGroup>
     <GlobalPackageReference Include="Bluehill.Imports" Version="1.0.7" />
   </ItemGroup>
 </Project>
