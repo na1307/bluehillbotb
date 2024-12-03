@@ -13,6 +13,8 @@ public static class Worker {
         RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     public static async Task RemoveUncategorizedTemplate(CancellationToken token = default) {
+        Console.WriteLine($"Operation started at: {DateTime.UtcNow}{Environment.NewLine}");
+
         using SiteLoginManager manager = new();
 
         await manager.LoginAsync();
@@ -51,6 +53,7 @@ public static class Worker {
             }
         } finally {
             await manager.LogoutAsync();
+            Console.WriteLine($"{Environment.NewLine}Operation ended at: {DateTime.UtcNow}");
         }
     }
 }
