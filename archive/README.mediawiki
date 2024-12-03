@@ -1,0 +1,7 @@
+= BluehillBot B archived code =
+This is the archived pywikibot source code for BluehillBot B.
+
+== LICENSE ==
+The license is basically MIT, but what I didn't make is different.
+
+* community_portal_list.py is licensed under CC BY SA 3.0+GFDL.

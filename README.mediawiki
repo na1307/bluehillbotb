@@ -1,6 +1,5 @@
 = BluehillBot B code =
-This is a BluehillBot B source code for the tasks which is not standard Pywikibot module.
+This is a BluehillBot B source code.
 
 == LICENSE ==
-The license is basically MIT, but what I didn't make is different.
-* community_portal_list.py is licensed under CC BY SA 3.0+GFDL.
+MIT License.
