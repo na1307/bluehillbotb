@@ -18,6 +18,8 @@ public static class Worker {
         await manager.LoginAsync();
 
         try {
+            using PeriodicTimer timer = new(TimeSpan.FromSeconds(62));
+
             await foreach (var page in new CategoryMembersGenerator(manager.Site, "분류:분류 필요 문서").EnumPagesAsync()
                                .WithCancellation(token)) {
                 await page.RefreshAsync(PageQueryOptions.FetchContent, token);
@@ -29,6 +31,8 @@ public static class Worker {
 
                     Console.WriteLine(
                         $"Title: \"{page.Title}\"{Environment.NewLine}New Text:{Environment.NewLine}{newText}");
+
+                    await timer.WaitForNextTickAsync(token);
 
 // I hate you Rider, because it does not fit my format
 #pragma warning disable IDE0055
