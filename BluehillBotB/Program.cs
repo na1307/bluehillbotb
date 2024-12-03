@@ -1,29 +1,17 @@
-﻿using WikiClientLibrary;
-using WikiClientLibrary.Client;
-using WikiClientLibrary.Pages;
-using WikiClientLibrary.Sites;
+﻿using BluehillBotB;
 
-using WikiClient client = new();
-client.ClientUserAgent = "BluehillBotB/0.0 (na1307@outlook.kr)";
-WikiSite site = new(client, "https://ko.wikipedia.org/w/api.php");
-
-await site.Initialization;
-
-try {
-    await site.LoginAsync("BluehillBot B", Environment.GetEnvironmentVariable("BOT_PASSWORD")!);
-} catch (WikiClientException ex) {
-    Console.WriteLine(ex.Message);
-    return;
+if (args.Length != 1) {
+    Console.WriteLine("Error: Only one parameter must be provided.");
+    return 1;
 }
 
-WikiPage page = new(site, "초안:연습장");
+switch (args[0]) {
+    case "remove-uncategorized-template":
+        await Worker.RemoveUncategorizedTemplate();
+        break;
 
-await page.RefreshAsync(PageQueryOptions.FetchContent);
+    default:
+        throw new ArgumentException("Invalid argument provided.", nameof(args));
+}
 
-Console.WriteLine(await page.EditAsync(new() {
-    Content = "{{연습장 안내문}}" + Environment.NewLine + "Test",
-    Minor = true,
-    Summary = "Test"
-}));
-
-await site.LogoutAsync();
+return 0;
