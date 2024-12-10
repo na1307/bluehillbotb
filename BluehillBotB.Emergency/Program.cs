@@ -38,6 +38,8 @@ app.UseAntiforgery();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
+app.UseCors();
+
 // OAuth callback endpoint
 app.MapGet("/oauth-callback", async (HttpContext http, MediaWikiOAuthService oauthService) => {
     var query = http.Request.Query;
