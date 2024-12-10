@@ -13,10 +13,6 @@ public sealed class MediaWikiOAuthService(IConfiguration config, IHttpClientFact
     public Uri BuildAuthorizationUrl() {
         var aep = config["MediaWiki:AuthorizationEndpoint"]!;
 
-        if (config["MediaWiki:ClientId"] is null) {
-            throw new NotSupportedException("appsettings.json is not working!!!!!\n\n" + Directory.GetCurrentDirectory());
-        }
-
         Dictionary<string, string> parameters = new() {
             ["client_id"] = config["MediaWiki:ClientId"]!,
             ["response_type"] = "code",

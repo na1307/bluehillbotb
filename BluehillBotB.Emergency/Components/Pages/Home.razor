@@ -11,8 +11,9 @@
 
 @if (userProfile is not null) {
     <p>Hello, @userProfile.UserName.</p>
-    <p>@userProfile.Groups</p>
-    <p>@userProfile.Groups.GetType().ToString()</p>
+    <p>@(userProfile.Groups.EnumerateArray().Select(e => e.GetString()).Contains("autoconfirmed")
+       ? "You are an autoconfirmed user."
+       : "You are not an autoconfirmed user.")</p>
 } else {
     <p>Click the below button to Log in.</p>
 

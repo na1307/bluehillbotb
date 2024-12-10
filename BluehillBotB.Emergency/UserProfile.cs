@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace BluehillBotB.Emergency;
 
-public sealed record class UserProfile(string UserName, object Groups);
+public sealed record class UserProfile(string UserName, JsonElement Groups);
