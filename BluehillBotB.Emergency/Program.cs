@@ -16,14 +16,6 @@ builder.Services.AddHttpContextAccessor()
 
 builder.Services.AddScoped<MediaWikiOAuthService>();
 
-builder.Services.AddCors(options => {
-    options.AddPolicy("MyCors", policy => {
-        policy.WithOrigins("https://bluehillbotb.toolforge.org")
-            .AllowAnyMethod()
-            .AllowAnyHeader();
-    });
-});
-
 var app = builder.Build();
 
 app.UseSession();
@@ -40,8 +32,6 @@ if (!app.Environment.IsDevelopment()) {
 }
 
 app.UseRouting();
-
-app.UseCors("MyCors");
 
 app.UseAntiforgery();
 
