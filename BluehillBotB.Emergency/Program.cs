@@ -1,6 +1,7 @@
 using BluehillBotB.Emergency;
 using BluehillBotB.Emergency.Components;
 using Microsoft.Extensions.FileProviders;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,8 +66,12 @@ app.MapGet("/oauth-callback", async (HttpContext http, MediaWikiOAuthService oau
 });
 
 // Submit endpoint
-app.MapPost("/submit", (SubmitData submitData) => {
+app.MapPost("/submit", async (SubmitData submitData) => {
     app.Logger.LogInformation("UserName: {UserName}, Reason: {Reason}", submitData.UserName, submitData.Reason);
+
+    await using (StreamWriter writer = new("/data/project/bluehillbotb/emergency.shutoff", true, new UTF8Encoding(false))) {
+        await writer.WriteLineAsync($"{submitData.UserName}: {submitData.Reason}");
+    }
 
     return Results.Ok("Success");
 });
