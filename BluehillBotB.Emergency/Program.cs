@@ -62,25 +62,10 @@ app.MapGet("/oauth-callback", async (HttpContext http, MediaWikiOAuthService oau
 });
 
 // Submit endpoint
-app.MapPost("/submit", async Task<IResult> (HttpContext http) => {
-    using StreamReader reader = new(http.Request.Body);
+app.MapPost("/submit", (SubmitData submitData) => {
+    app.Logger.LogInformation("UserName: {UserName}, Reason: {Reason}", submitData.UserName, submitData.Reason);
 
-    var value = await reader.ReadToEndAsync();
-
-    app.Logger.LogInformation("{Value}", value);
-
-    return TypedResults.Redirect("/submitted");
-
-    /*
-    var submitData = await request.ReadFromJsonAsync<SubmitData>();
-
-    if (submitData is not null) {
-        app.Logger.LogInformation("UserName: {UserName}, Reason: {Reason}", submitData.UserName, submitData.Reason);
-        return TypedResults.Redirect("/submitted");
-    } else {
-        return TypedResults.BadRequest();
-    }
-    */
+    return Results.Ok("Success");
 });
 
 await app.RunAsync();
