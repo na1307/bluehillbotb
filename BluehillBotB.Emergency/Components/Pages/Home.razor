@@ -58,13 +58,11 @@
     private async Task submit() {
         using var client = HttpClientFactory.CreateClient();
 
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("BluehillBotB-Emergency-Shutoff/0.0 (na1307@outlook.kr)");
+        
         var asdf = await client.PostAsJsonAsync(new Uri("https://bluehillbotb.toolforge.org/submit"), submitData);
 
         if (!asdf.IsSuccessStatusCode) {
-            foreach (var header in asdf.Headers) {
-                LoggerFactory.CreateLogger("asdf").LogInformation("Key: {Key}, Values: {Values}", header.Key, string.Concat(header.Value));
-            }
-
             LoggerFactory.CreateLogger("c8rom").LogInformation(await asdf.Content.ReadAsStringAsync());
         }
     }
