@@ -66,6 +66,6 @@ app.MapPost("/submit", (SubmitData submitData) => {
     app.Logger.LogInformation("UserName: {UserName}, Reason: {Reason}", submitData.UserName, submitData.Reason);
 
     return Results.Ok("Success");
-});
+}).WithMetadata(new Microsoft.AspNetCore.Mvc.IgnoreAntiforgeryTokenAttribute());
 
 await app.RunAsync();
