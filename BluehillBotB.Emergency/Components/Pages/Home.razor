@@ -2,36 +2,62 @@
 @inject NavigationManager NavManager
 @inject MediaWikiOAuthService OAuthService
 @inject IHttpContextAccessor HttpContextAccessor
+@inject IHttpClientFactory HttpClientFactory
 
-<PageTitle>Home</PageTitle>
+<PageTitle>BluehillBot B 긴급 정지 버튼</PageTitle>
 
-<h1>Hello, world!</h1>
+@if (userProfile is null) {
+    <h1>BluehillBot B 긴급 정지 버튼</h1>
 
-<p>Welcome to your new app.</p>
+    <p>아래 버튼을 눌러 로그인 해 주세요.</p>
 
-@if (userProfile is not null) {
-    <p>Hello, @userProfile.UserName.</p>
-    <p>@(userProfile.Groups.EnumerateArray().Select(e => e.GetString()).Contains("autoconfirmed")
-       ? "You are an autoconfirmed user."
-       : "You are not an autoconfirmed user.")</p>
-} else {
-    <p>Click the below button to Log in.</p>
-
-    <p>
-        <button @onclick="login">Log in</button>
+    <p style="text-align: center">
+        <button class="btn btn-primary" style="width: 500px" @onclick="login">로그인</button>
     </p>
+} else if (userProfile.Groups.EnumerateArray().Select(e => e.GetString()).Contains("autoconfirmed")) {
+    <h1>BluehillBot B 긴급 정지 버튼</h1>
+
+    <p>아래 입력란에다가 이유를 써 주세요. 필수 사항입니다.</p>
+
+    <EditForm Model="submitData" OnValidSubmit="submit" FormName="TheForm">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+        <p>
+            <InputTextArea @bind-Value="submitData!.Reason"/>
+        </p>
+        <p style="text-align: center">
+            <button class="btn btn-primary" style="width: 500px" type="submit">제출</button>
+        </p>
+    </EditForm>
+} else {
+    <PageTitle>오류</PageTitle>
+
+    <h1>오류</h1>
+
+    <p>당신은 자동 인증된 사용자가 아니기에 봇을 정지시킬 권한이 없습니다.</p>
 }
 
 @code {
     private UserProfile? userProfile;
+
+    [SupplyParameterFromForm]
+    private SubmitData? submitData { get; set; } 
 
     protected override async Task OnInitializedAsync() {
         var accessToken = HttpContextAccessor.HttpContext!.Session.GetString("AccessToken");
 
         if (accessToken is not null) {
             userProfile = await OAuthService.GetUserProfileAsync(accessToken);
+            submitData = new(userProfile.UserName);
         }
     }
 
     private void login() => NavManager.NavigateTo(OAuthService.BuildAuthorizationUrl().ToString(), forceLoad: true);
+
+    private async Task submit() {
+        using var client = HttpClientFactory.CreateClient();
+
+        await client.PostAsJsonAsync(new Uri("https://bluehillbotb.toolforge.org/submit"), submitData);
+    }
+
 }
