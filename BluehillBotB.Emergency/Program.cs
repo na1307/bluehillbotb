@@ -40,6 +40,7 @@ app.MapRazorComponents<App>()
 app.MapGet("/oauth-callback", async (HttpContext http, MediaWikiOAuthService oauthService) => {
     var query = http.Request.Query;
     string code = query["code"]!;
+    string? error = query["error"];
 
     if (!string.IsNullOrEmpty(code)) {
         // Exchange authorization code for access token
@@ -49,6 +50,9 @@ app.MapGet("/oauth-callback", async (HttpContext http, MediaWikiOAuthService oau
         http.Session.SetString("AccessToken", accessToken);
 
         // Redirect user back to home page or a protected page
+        http.Response.Redirect("/");
+    } else if (!string.IsNullOrEmpty(error) && error == "unauthorized_client") {
+        // Just redirect user back to home page
         http.Response.Redirect("/");
     } else {
         http.Response.StatusCode = 400;
