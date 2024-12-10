@@ -3,6 +3,7 @@
 @inject MediaWikiOAuthService OAuthService
 @inject IHttpContextAccessor HttpContextAccessor
 @inject IHttpClientFactory HttpClientFactory
+@inject ILoggerFactory LoggerFactory
 
 <PageTitle>BluehillBot B 긴급 정지 버튼</PageTitle>
 
@@ -57,7 +58,15 @@
     private async Task submit() {
         using var client = HttpClientFactory.CreateClient();
 
-        await client.PostAsJsonAsync(new Uri("https://bluehillbotb.toolforge.org/submit"), submitData);
+        var asdf = await client.PostAsJsonAsync(new Uri("https://bluehillbotb.toolforge.org/submit"), submitData);
+
+        if (!asdf.IsSuccessStatusCode) {
+            foreach (var header in asdf.Headers) {
+                LoggerFactory.CreateLogger("asdf").LogInformation("Key: {Key}, Values: {Values}", header.Key, string.Concat(header.Value));
+            }
+
+            LoggerFactory.CreateLogger("c8rom").LogInformation(await asdf.Content.ReadAsStringAsync());
+        }
     }
 
 }

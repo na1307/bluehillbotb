@@ -4,6 +4,9 @@ using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
 builder.Configuration.SetBasePath(AppContext.BaseDirectory).AddJsonFile("appsettings.json");
 
 // Add services to the container.
@@ -66,6 +69,6 @@ app.MapPost("/submit", (SubmitData submitData) => {
     app.Logger.LogInformation("UserName: {UserName}, Reason: {Reason}", submitData.UserName, submitData.Reason);
 
     return Results.Ok("Success");
-}).WithMetadata(new Microsoft.AspNetCore.Mvc.IgnoreAntiforgeryTokenAttribute());
+});
 
 await app.RunAsync();
