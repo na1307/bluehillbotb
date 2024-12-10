@@ -63,9 +63,14 @@ app.MapGet("/oauth-callback", async (HttpContext http, MediaWikiOAuthService oau
 
 // Submit endpoint
 app.MapPost("/submit", async (HttpRequest request) => {
-    var submitData = await request.ReadFromJsonAsync<SubmitData>() ?? throw new InvalidOperationException();
-    app.Logger.LogInformation("UserName: {UserName}, Reason: {Reason}", submitData.UserName, submitData.Reason);
-    request.HttpContext.Response.Redirect("https://bluehillbotb.toolforge.org/submitted");
+    var submitData = await request.ReadFromJsonAsync<SubmitData>();
+
+    if (submitData is not null) {
+        app.Logger.LogInformation("UserName: {UserName}, Reason: {Reason}", submitData.UserName, submitData.Reason);
+        request.HttpContext.Response.Redirect("https://bluehillbotb.toolforge.org/submitted");
+    } else {
+        request.HttpContext.Response.StatusCode = 400;
+    }
 });
 
 await app.RunAsync();
