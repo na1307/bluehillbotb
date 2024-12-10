@@ -1,4 +1,7 @@
 ﻿@page "/"
+@inject NavigationManager NavManager
+@inject MediaWikiOAuthService OAuthService
+@inject IHttpContextAccessor HttpContextAccessor
 
 <PageTitle>Home</PageTitle>
 
@@ -6,12 +9,28 @@
 
 <p>Welcome to your new app.</p>
 
-<p>Clicked: @clicked</p>
+@if (userProfile is not null) {
+    <p>Hello, @userProfile.UserName.</p>
+    <p>@userProfile.Groups</p>
+    <p>@userProfile.Groups.GetType().ToString()</p>
+} else {
+    <p>Click the below button to Log in.</p>
 
-<p><button @onclick="increase">Click me</button></p>
+    <p>
+        <button @onclick="login">Log in</button>
+    </p>
+}
 
 @code {
-    private int clicked;
+    private UserProfile? userProfile;
 
-    private void increase() => clicked++;
+    protected override async Task OnInitializedAsync() {
+        var accessToken = HttpContextAccessor.HttpContext!.Session.GetString("AccessToken");
+
+        if (accessToken is not null) {
+            userProfile = await OAuthService.GetUserProfileAsync(accessToken);
+        }
+    }
+
+    private void login() => NavManager.NavigateTo(OAuthService.BuildAuthorizationUrl().ToString(), forceLoad: true);
 }
