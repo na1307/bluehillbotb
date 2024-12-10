@@ -1,4 +1,5 @@
 using BluehillBotB.Emergency.Components;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +14,14 @@ if (!app.Environment.IsDevelopment()) {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
 }
 
-app.UseStaticFiles();
+if (!app.Environment.IsDevelopment()) {
+    app.UseStaticFiles(new StaticFileOptions {
+        FileProvider = new PhysicalFileProvider(Path.Combine(AppContext.BaseDirectory, "wwwroot")),
+    });
+} else {
+    app.UseStaticFiles();
+}
+
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
