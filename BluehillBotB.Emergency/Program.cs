@@ -62,15 +62,25 @@ app.MapGet("/oauth-callback", async (HttpContext http, MediaWikiOAuthService oau
 });
 
 // Submit endpoint
-app.MapPost("/submit", async (HttpRequest request) => {
+app.MapPost("/submit", async Task<IResult> (HttpContext http) => {
+    using StreamReader reader = new(http.Request.Body);
+
+    var value = await reader.ReadToEndAsync();
+
+    app.Logger.LogInformation("{Value}", value);
+
+    return TypedResults.Redirect("/submitted");
+
+    /*
     var submitData = await request.ReadFromJsonAsync<SubmitData>();
 
     if (submitData is not null) {
         app.Logger.LogInformation("UserName: {UserName}, Reason: {Reason}", submitData.UserName, submitData.Reason);
-        request.HttpContext.Response.Redirect("https://bluehillbotb.toolforge.org/submitted");
+        return TypedResults.Redirect("/submitted");
     } else {
-        request.HttpContext.Response.StatusCode = 400;
+        return TypedResults.BadRequest();
     }
+    */
 });
 
 await app.RunAsync();
