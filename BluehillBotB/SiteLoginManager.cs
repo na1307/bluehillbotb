@@ -8,7 +8,7 @@ public sealed class SiteLoginManager : IDisposable {
 
     public SiteLoginManager() {
         client = new() {
-            ClientUserAgent = "BluehillBotB/0.0 (na1307@outlook.kr)"
+            ClientUserAgent = "BluehillBotB/0.0 (https://bluehillbotb.toolforge.org; na1307@outlook.kr)"
         };
         Site = new(client, "https://ko.wikipedia.org/w/api.php");
     }

@@ -5,6 +5,11 @@ if (args.Length != 1) {
     return 1;
 }
 
+if (File.Exists("/data/project/bluehillbotb/emergency.shutoff")) {
+    Console.WriteLine("Emergency shutoff found.");
+    return 1;
+}
+
 switch (args[0]) {
     case "remove-uncategorized-template":
         await Worker.RemoveUncategorizedTemplate();

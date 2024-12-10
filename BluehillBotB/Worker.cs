@@ -36,6 +36,10 @@ public static class Worker {
 
                     await timer.WaitForNextTickAsync(token);
 
+                    if (File.Exists("/data/project/bluehillbotb/emergency.shutoff")) {
+                        throw new OperationCanceledException("Emergency shutoff");
+                    }
+                    
 // I hate you Rider, because it does not fit my format
 #pragma warning disable IDE0055
                     if (!await page.EditAsync(new() {
