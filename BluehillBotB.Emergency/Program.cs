@@ -4,6 +4,8 @@ using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.SetBasePath(AppContext.BaseDirectory).AddJsonFile("appsettings.json");
+
 // Add services to the container.
 builder.Services.AddHttpContextAccessor()
     .AddHttpClient()
