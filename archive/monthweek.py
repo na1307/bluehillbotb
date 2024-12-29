@@ -1,17 +1,18 @@
 import calendar
 import datetime
-import math
-from collections import namedtuple
+from typing import NamedTuple, Dict
 import pywikibot
 import sys
 
 
-ProjectPage = namedtuple('ProjectPage', ['name', 'isWeek'])
+class ProjectPage(NamedTuple):
+    """프로젝트 문서 페이지 정보를 나타내는 NamedTuple."""
+    name: str
+    isWeek: bool  # False: 월별 문서, True: 주별 문서
 
 
-# False: 월별 문서
-# True: 주별 문서
-PPDICT = {
+# PPDICT에 대한 타입 주석: key는 str, 값은 ProjectPage
+PPDICT: Dict[str, ProjectPage] = {
     '사': ProjectPage('사랑방', True),
     '기': ProjectPage('사랑방 (기술)', False),
     '질': ProjectPage('질문방', True),
@@ -23,12 +24,38 @@ PPDICT = {
 }
 
 
-def weeks_for_year(year):
-    last_week = datetime.date(year, 12, 28)
-    return last_week.isocalendar().week
+def weeks_for_year(year: int) -> int:
+    """
+    주어진 연도(year)가 ISO 8601 기준으로 53주가 있는지 확인한 뒤,
+    53주가 유효하면 53을, 그렇지 않으면 52를 반환합니다.
+
+    Args:
+        year (int): ISO 주 수를 확인할 연도 (예: 2024)
+
+    Returns:
+        int: 53주가 존재하면 53, 아니면 52
+    """
+    try:
+        _ = datetime.date.fromisocalendar(year, 53, 7)  # 일요일(7)
+        return 53
+    except ValueError:
+        return 52
 
 
-def week_of_month(tgtdate):
+def week_of_month(tgtdate: datetime.date) -> int:
+    """
+    인자로 받은 날짜가 해당 달에서 몇 번째 주에 속하는지 계산해 반환합니다.
+
+    내부 로직상, (tgtdate.month)의 1일부터 시작해
+    'd.day - d.weekday() > 0'이 되는 가장 첫 날짜를 해당 달의 '시작 주'로 간주하고,
+    그 이후 (tgtdate - startdate)를 7일 단위로 나눈 값 + 1을 반환합니다.
+
+    Args:
+        tgtdate (datetime.date): 몇 번째 주인지 계산할 날짜
+
+    Returns:
+        int: 해당 날짜가 달 안에서 몇 번째 주인지
+    """
     days_this_month = calendar.mdays[tgtdate.month]
 
     for i in range(1, days_this_month):
@@ -37,44 +64,63 @@ def week_of_month(tgtdate):
             startdate = d
             break
 
-    return (tgtdate - startdate).days //7 + 1
+    return (tgtdate - startdate).days // 7 + 1
 
 
-def main(argv: list[str]):
+def main(argv: list[str]) -> None:
+    """
+    메인 함수.
+    인자로부터 연도와 키워드를 받아, 주별 문서나 월별 문서를 생성합니다.
+
+    Args:
+        argv (list[str]): 
+            - argv[1]: 연도(예: "2025")
+            - argv[2]: 키워드(예: "사" - 사랑방)
+
+    Raises:
+        ValueError: 
+            - 인자 개수가 3개가 아닐 때
+            - 주어진 키워드가 PPDICT에 없을 때
+    """
     if len(argv) != 3:
-        raise Exception('asdf1')
+        raise ValueError('인자가 3개여야 합니다. 예: monthweek.py 2025 사')
 
     if argv[2] not in PPDICT:
-        raise Exception('asdf2')
+        raise ValueError(f'유효하지 않은 키워드입니다: {argv[2]}')
 
     site = pywikibot.Site()
-    year = argv[1]
-    ppagevalue = PPDICT.get(argv[2])
+    year = int(argv[1])
+    ppagevalue = PPDICT[argv[2]]
 
     if not ppagevalue.isWeek:
+        # 월별 문서
         for month in range(1, 13):
-            c_text = '<noinclude>{{위키백과:' + ppagevalue.name + '/보존|' + year + '|' + str(month) +'}}</noinclude>'
-            page = pywikibot.Page(site, '위키백과:' + ppagevalue.name + '/' + year + '년 ' + str(month) + '월')
-            page.text = c_text
-            print(page.text)
+            page = pywikibot.Page(site, f'위키백과:{ppagevalue.name}/{year}년 {month}월')
+            page.text = f'<noinclude>{{{{위키백과:{ppagevalue.name}/보존|{year}|{month}}}}}</noinclude>'
+            print(f'[DEBUG] {page.title()}:\n{page.text}')
             page.save('봇: 월별 문서 생성')
     else:
-        wfy = weeks_for_year(int(year))
+        # 주별 문서
+        for week in range(1, weeks_for_year(year) + 1):
+            iso_sunday = datetime.date.fromisocalendar(year, week, 7) # ISO 주의 일요일
+            day_value = iso_sunday.day
+            month_value = iso_sunday.month
 
-        for week in range(1, wfy + 1):
-            month_value = math.ceil(week / (wfy / 12))
-
-            if week_of_month(datetime.date(int(year), month_value, datetime.datetime.strptime(year + '-W' + str(week) + '-0', "%Y-W%W-%w").day)) == 0:
-                c_month_value = month_value - 1
+            if week_of_month(datetime.date(year, month_value, day_value)) == 0:
+                c_month_value = month_value - 1 if month_value != 1 else 1
                 tworow = True
             else:
                 c_month_value = month_value
                 tworow = False
 
-            c_text = '<noinclude>{{위키백과:' + ppagevalue.name + '/보존' + ('2' if ppagevalue.name != '사랑방' else '') + '|년=' + year + '|월=' + str(c_month_value)  + '|주=' + str(week) + ('|2단=예' if tworow else '') +'}}</noinclude>'
-            page = pywikibot.Page(site, '위키백과:' + ppagevalue.name + '/' + year + '년 제' + str(week) + '주')
-            page.text = c_text
-            print(page.text)
+            page = pywikibot.Page(site, f'위키백과:{ppagevalue.name}/{year}년 제{week}주')
+            page.text = (
+                f'<noinclude>{{{{위키백과:{ppagevalue.name}/보존'
+                f'{"2" if ppagevalue.name != "사랑방" else ""}'
+                f'|년={year}|월={c_month_value}|주={week}'
+                f'{"|2단=예" if tworow else ""}}}}}</noinclude>'
+            )
+            print(f'[DEBUG] {page.title()}:\n{page.text}')
             page.save('봇: 주별 문서 생성')
 
 
