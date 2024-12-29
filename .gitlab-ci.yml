@@ -1,0 +1,12 @@
+stages:
+  - build
+
+build-job:
+  stage: build
+  image: mcr.microsoft.com/dotnet/sdk:8.0
+  script:
+    - dotnet restore
+    - dotnet build --no-restore
+  only:
+    - main
+    - emergency
