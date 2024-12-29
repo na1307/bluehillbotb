@@ -1,14 +1,7 @@
-﻿@inherits LayoutComponentBase
+﻿@using Bluehill.Blazor.Layout
+@inherits LayoutComponentBase
 
-<div class="page">
-    <main>
-        <div class="flex-wrapper">
-            <article class="content px-4">
-                @Body
-            </article>
-        </div>
-    </main>
-</div>
+<BluehillLayout Body="@Body" />
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.

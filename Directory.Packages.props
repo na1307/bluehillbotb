@@ -5,9 +5,10 @@
     <CentralPackageVersionOverrideEnabled>false</CentralPackageVersionOverrideEnabled>
   </PropertyGroup>
   <ItemGroup>
+    <PackageVersion Include="Bluehill.Blazor" Version="0.8.1" />
     <PackageVersion Include="IdentityModel" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <GlobalPackageReference Include="Bluehill.Imports" Version="1.0.7" />
+    <GlobalPackageReference Include="Bluehill.Imports" Version="1.0.8" />
   </ItemGroup>
 </Project>
